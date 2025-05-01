@@ -1,0 +1,11 @@
+[project]
+name = "shh"
+version = "0.1.0"
+description = "be very very quiet"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.115.12",
+    "faster-whisper>=1.1.1",
+    "ollama>=0.4.8",
+]

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>shh! | be very very quiet</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="flex flex-col h-screen gap-3 p-3">
+    <div id="messages" class="flex flex-col gap-3 overflow-y-auto text-lg"></div>
+    <div class="flex gap-3 text-2xl">
+      <textarea id="message-input" class="border-2 border-slate-200 border-solid field-sizing-content resize-none p-3 rounded w-full" rows="2"></textarea>
+      <button id="message-button">&#127908;</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="assets/js/app.js"></script>
+  </body>
+</html>
