@@ -148,7 +148,7 @@
   }
 
   messageInput.addEventListener('keydown', (e) => {
-    if (!isEmpty && e.keyCode === 13 && !e.shiftKey) {
+    if (!isEmpty && e.keyCode === 13 && !e.shiftKey && !e.repeat) {
       addTextMessage();
     }
   }, false);
