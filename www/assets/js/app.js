@@ -143,7 +143,7 @@
       requestAnimationFrame(() => {
         addMessage('self', {text})
         messageInput.value = '';
-        onMessageInputChange(e);
+        onMessageInputChange();
       });
   }
 
