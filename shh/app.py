@@ -2,6 +2,7 @@ import asyncio
 import base64
 import io
 import json
+import os
 
 from fastapi import BackgroundTasks, FastAPI, Request
 from fastapi.responses import StreamingResponse
@@ -11,8 +12,8 @@ from ollama import AsyncClient
 
 history = []
 
-DEFAULT_LLM_MODEL = 'gemma3:latest'
-TRANSCRIPTION_MODEL = 'turbo'
+LLM_MODEL = os.environ.get('LLM_MODEL', 'gemma3:latest')
+TRANSCRIPTION_MODEL = os.environ.get('TRANSCRIPTION_MODEL', 'turbo')
 DEFAULT_TRANSCRIPTION_DEVICE = 'cpu'
 DEFAULT_TRANSCRIPTION_COMPUTE_TYPE = 'int8'
 TRANSCRIPTION_BATCH_SIZE = 16
@@ -21,17 +22,16 @@ TRANSCRIPTION_BATCH_SIZE = 16
 def get_transcription_device():
     return DEFAULT_TRANSCRIPTION_DEVICE
 
+
 def get_transcription_compute_type():
     return DEFAULT_TRANSCRIPTION_COMPUTE_TYPE
 
 async def transcribe_audio(model, audio):
-
     binary_io = io.BytesIO(base64.b64decode(audio))
     segments, info = model.transcribe(
         binary_io,
         batch_size=TRANSCRIPTION_BATCH_SIZE
     )
-
     return ''.join(list(map(lambda segment: segment.text, segments)))
 
 async def audio_to_chat(queue, model, audio):
@@ -47,7 +47,7 @@ async def audio_to_chat(queue, model, audio):
 async def llm_chat(queue, **kwargs):
     chunks = []
 
-    model = kwargs.get('model', DEFAULT_LLM_MODEL)
+    model = kwargs.get('model', LLM_MODEL)
     messages = kwargs.get('messages', [])
 
     async for chunk in await AsyncClient().chat(model=model, messages=messages, stream=True):
