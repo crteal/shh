@@ -2,6 +2,10 @@
 
   'use strict';
 
+  const ENTITY_MICROPHONE = '&#8593;';
+  const ENTITY_RECORD = '&#9632;';
+  const ENTITY_SUBMIT = '&#127908';
+
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     console.error('getUserMedia unsupported');
     return;
@@ -109,10 +113,10 @@
   function onMessageInputChange(e) {
     if (messageInput.value) {
       if (isEmpty) {
-        messageButton.innerHTML = '&#8593;';
+        messageButton.innerHTML = ENTITY_MICROPHONE;
       }
     } else if (!isEmpty) {
-      messageButton.innerHTML = '&#127908';
+      messageButton.innerHTML = ENTITY_SUBMIT;
     }
     isEmpty = !messageInput.value;
   }
@@ -157,11 +161,11 @@
 
     if (mediaRecorder.state === 'inactive') {
       messageButton.classList.add('animate-pulse', 'text-red-500');
-      messageButton.innerHTML = '&#9632;';
+      messageButton.innerHTML = ENTITY_RECORD;
       mediaRecorder.start();
     } else if (mediaRecorder.state === 'recording') {
       messageButton.classList.remove('animate-pulse', 'text-red-500');
-      messageButton.innerHTML = '&#127908';
+      messageButton.innerHTML = ENTITY_MICROPHONE;
       mediaRecorder.stop();
     }
   });
