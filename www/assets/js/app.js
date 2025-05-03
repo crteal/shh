@@ -9,7 +9,7 @@
 
   const messages = document.querySelector('#messages');
 
-  function addMessage(owner, data) {
+  function createMessageElement(owner) {
     const isSelf = (owner === 'self');
     const el = document.createElement('div');
 
@@ -26,29 +26,18 @@
       el.classList.add('bg-blue-100', 'self-end');
     }
 
+    return el;
+  }
+
+  function addMessage(owner, data) {
+    const el = createMessageElement(owner);
     el.innerHTML = marked.parse(data.text);
-
     messages.append(el);
-
     requestAnimationFrame(() => el.scrollIntoView());
   }
 
   function addAudioMessage(owner, url) {
-    const isSelf = (owner === 'self');
-    const el = document.createElement('div');
-
-    el.classList.add(
-      'border-2',
-      (isSelf ? 'border-blue-200' : 'border-slate-200'),
-      'border-solid',
-      'max-w-9/10',
-      'p-3',
-      'rounded-xl'
-    );
-
-    if (owner === 'self') {
-      el.classList.add('bg-blue-100', 'self-end');
-    }
+    const el = createMessageElement(owner);
 
     const audio = document.createElement('audio');
     audio.controls = true;
