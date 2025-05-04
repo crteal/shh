@@ -13,6 +13,16 @@
 
   const messages = document.querySelector('#messages');
 
+  function createRespondingIndicator() {
+    const el = document.createElement('div');
+    el.textContent = '…';
+    el.classList.add(
+      'animate-pulse',
+      'font-bold'
+    );
+    return el;
+  }
+
   function createMessageElement(owner) {
     const isSelf = (owner === 'self');
     const el = document.createElement('div');
@@ -23,11 +33,12 @@
       'border-solid',
       'max-w-9/10',
       'p-3',
-      'rounded-xl'
+      'rounded-xl',
+      (isSelf ? 'self-end' : 'self-start')
     );
 
-    if (owner === 'self') {
-      el.classList.add('bg-blue-100', 'self-end');
+    if (isSelf) {
+      el.classList.add('bg-blue-100');
     }
 
     return el;
@@ -35,8 +46,26 @@
 
   function addMessage(owner, data) {
     const el = createMessageElement(owner);
-    el.innerHTML = marked.parse(data.text);
+
+    if (data.text) {
+      el.innerHTML = marked.parse(data.text);
+    } else if (data.content) {
+      el.append(data.content);
+    }
+
     messages.append(el);
+    requestAnimationFrame(() => el.scrollIntoView());
+    return el;
+  }
+
+  function appendToMessage(message, data, shouldReplace = false) {
+    const el = document.createElement('div');
+    el.innerHTML = marked.parse(data.text);
+    if (shouldReplace) {
+      message.replaceWith(el);
+    } else {
+      message.append(el);
+    }
     requestAnimationFrame(() => el.scrollIntoView());
   }
 
@@ -55,6 +84,7 @@
   }
 
   function createEventSource() {
+    let el = null;
     let chunks = [];
     const eventSource = new EventSource('/chat');
 
@@ -66,8 +96,11 @@
       const data = JSON.parse(e.data);
       chunks.push(data.content);
       if (data.done) {
-        addMessage('partner', {text: chunks.join('')});
+        appendToMessage(el, {text: chunks.join('')}, true);
         chunks = [];
+      } else if (chunks.length === 1) {
+        el = createRespondingIndicator();
+        addMessage('partner', {content: el});
       }
     };
 
