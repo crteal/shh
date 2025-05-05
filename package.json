@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "@tailwindcss/cli": "4.1.5",
+    "@tailwindcss/typography": "0.5.16",
+    "tailwindcss": "4.1.5"
+  },
+  "scripts": {
+    "build": "npx @tailwindcss/cli -i ./www/assets/css/base.css -o ./www/assets/css/style.css",
+    "watch": "npx @tailwindcss/cli -i ./www/assets/css/base.css -o ./www/assets/css/style.css --watch"
+  }
+}

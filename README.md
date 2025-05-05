@@ -6,8 +6,9 @@ An experimental generative Artificial Intelligence (AI) chat interface, powered 
 
 ## Requirements
 
-* Python 3.9 or greater
+* Node Package Manager (NPM) 11.3.0 or greater
 * Ollama 0.6.7 or greater
+* Python 3.9 or greater
 
 By default, unless an override is specified via the `LLM_MODEL` environment variable, Ollama will load the `gemma3:latest` model. Currently, this must be done manually, and can be achieved using the Ollama command line interface ahead of running the server via...
 
@@ -27,7 +28,7 @@ git clone git@github.com:crteal/shh.git
 
 ## Run
 
-From the root of the repository, create a Python virtual environment (e.g., `uv venv`), activate it, install Python dependencies (e.g., `uv sync`), then type...
+From the root of the repository, create a Python virtual environment (e.g., `uv venv`), activate it, install Python dependencies (e.g., `uv sync`), compile Tailwind (e.g., `npm run build`), then type...
 
 ```bash
 fastapi run
