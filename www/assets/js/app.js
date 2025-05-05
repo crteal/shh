@@ -108,10 +108,6 @@
     let chunks = [];
     const eventSource = new EventSource('/chat');
 
-    eventSource.onopen = () => {
-      console.log(eventSource, 'open');
-    };
-
     eventSource.onmessage = (e) => {
       const data = JSON.parse(e.data);
       chunks.push(data.content);
