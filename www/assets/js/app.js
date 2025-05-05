@@ -2,9 +2,29 @@
 
   'use strict';
 
-  const ENTITY_MICROPHONE = '&#8593;';
+  const ENTITY_MICROPHONE = '&#127908;';
   const ENTITY_RECORD = '&#9632;';
-  const ENTITY_SUBMIT = '&#127908';
+  const ENTITY_SUBMIT = '&#8593;';
+
+  const inputStateMachine = {
+    state: ENTITY_MICROPHONE,
+    states: {
+      [ENTITY_MICROPHONE]: (value) => (
+        (typeof value === 'string')
+        ? (!value ? ENTITY_MICROPHONE : ENTITY_SUBMIT)
+        : ENTITY_RECORD
+      ),
+      [ENTITY_SUBMIT]: (value) => (
+        value ? ENTITY_SUBMIT : ENTITY_MICROPHONE
+      ),
+      [ENTITY_RECORD]: () => ENTITY_MICROPHONE
+    },
+    transition: (value) => {
+      const fn = inputStateMachine.states[inputStateMachine.state];
+      inputStateMachine.state = fn(value);
+      return inputStateMachine.state;
+    }
+  };
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     console.error('getUserMedia unsupported');
@@ -141,17 +161,12 @@
 
   const messageInput = document.querySelector('#message-input');
 
-  let isEmpty = !messageInput.value;
-
   function onMessageInputChange(e) {
-    if (messageInput.value) {
-      if (isEmpty) {
-        messageButton.innerHTML = ENTITY_MICROPHONE;
-      }
-    } else if (!isEmpty) {
-      messageButton.innerHTML = ENTITY_SUBMIT;
+    const currentState = inputStateMachine.state;
+    const nextState = inputStateMachine.transition(messageInput.value);
+    if (currentState !== nextState) {
+      messageButton.innerHTML = nextState;
     }
-    isEmpty = !messageInput.value;
   }
 
   messageInput.addEventListener('input', onMessageInputChange, false);
@@ -174,7 +189,7 @@
   }
 
   messageInput.addEventListener('keydown', (e) => {
-    if (!isEmpty && e.keyCode === 13 && !e.shiftKey && !e.repeat) {
+    if (messageInput.value && e.keyCode === 13 && !e.shiftKey && !e.repeat) {
       addTextMessage();
     }
   }, false);
@@ -182,7 +197,7 @@
   let mediaRecorder;
 
   messageButton.addEventListener('click', (e) => {
-    if (!isEmpty) {
+    if (messageInput.value) {
       addTextMessage();
       return;
     }
@@ -192,13 +207,15 @@
       return;
     }
 
+    inputStateMachine.transition();
+
     if (mediaRecorder.state === 'inactive') {
       messageButton.classList.add('animate-pulse', 'text-red-500');
-      messageButton.innerHTML = ENTITY_RECORD;
+      messageButton.innerHTML = inputStateMachine.state;
       mediaRecorder.start();
     } else if (mediaRecorder.state === 'recording') {
       messageButton.classList.remove('animate-pulse', 'text-red-500');
-      messageButton.innerHTML = ENTITY_MICROPHONE;
+      messageButton.innerHTML = inputStateMachine.state;
       mediaRecorder.stop();
     }
   });
