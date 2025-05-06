@@ -12,24 +12,43 @@ from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from faster_whisper import WhisperModel, BatchedInferencePipeline
 from ollama import AsyncClient
+import torch
 
 history = []
 
 LLM_MODEL = os.environ.get('LLM_MODEL', 'gemma3:latest')
 TRANSCRIPTION_MODEL = os.environ.get('TRANSCRIPTION_MODEL', 'turbo')
-DEFAULT_TRANSCRIPTION_DEVICE = 'cpu'
-DEFAULT_TRANSCRIPTION_COMPUTE_TYPE = 'int8'
+
+TRANSCRIPTION_DEVICE_CPU = 'cpu'
+TRANSCRIPTION_DEVICE_GPU = 'cuda'
+TRANSCRIPTION_DEVICE_CPU_COMPUTE_TYPE = 'int8'
+TRANSCRIPTION_DEVICE_GPU_COMPUTE_TYPE = 'float16'
 TRANSCRIPTION_BATCH_SIZE = 16
+
+
+def is_cuda_available():
+    """Returns true if Compute Unified Defice Architecture (CUDA) is available"""
+    return torch.cuda.is_available()
 
 
 def get_transcription_device():
     """Gets the device for the transcription model"""
-    return DEFAULT_TRANSCRIPTION_DEVICE
+    detected_device = TRANSCRIPTION_DEVICE_GPU if is_cuda_available() else TRANSCRIPTION_DEVICE_CPU
+    transcription_device = os.environ.get('TRANSCRIPTION_DEVICE', detected_device)
+    return transcription_device
 
 
 def get_transcription_compute_type():
     """Gets the compute type for the transcription model"""
-    return DEFAULT_TRANSCRIPTION_COMPUTE_TYPE
+    detected_compute_type = TRANSCRIPTION_DEVICE_GPU_COMPUTE_TYPE if is_cuda_available() else TRANSCRIPTION_DEVICE_CPU_COMPUTE_TYPE
+    transcription_compute_type = os.environ.get('TRANSCRIPTION_COMPUTE_TYPE', detected_compute_type)
+    return transcription_compute_type
+
+
+def get_transcription_batch_size():
+    """Gets the batch size for transcription"""
+    batch_size = os.environ.get('TRANSCRIPTION_BATCH_SIZE', TRANSCRIPTION_BATCH_SIZE)
+    return batch_size
 
 
 async def transcribe_audio(model, audio):
@@ -37,7 +56,7 @@ async def transcribe_audio(model, audio):
     binary_io = io.BytesIO(base64.b64decode(audio))
     segments, _ = model.transcribe(
         binary_io,
-        batch_size=TRANSCRIPTION_BATCH_SIZE
+        batch_size=get_transcription_batch_size()
     )
     return ''.join(list(map(lambda segment: segment.text, segments)))
 
