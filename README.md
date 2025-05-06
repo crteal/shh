@@ -28,7 +28,7 @@ git clone git@github.com:crteal/shh.git
 
 ## Run
 
-From the root of the repository, create a Python virtual environment (e.g., `uv venv`), activate it, install Python dependencies (e.g., `uv sync`), compile Tailwind (e.g., `npm run build`), then type...
+From the root of the repository, create a Python virtual environment (e.g., `uv venv`), activate it, install Python dependencies (e.g., `uv sync`), install Node dependencies (e.g., `npm install`), compile Tailwind (e.g., `npm run build`), then type...
 
 ```bash
 fastapi run
